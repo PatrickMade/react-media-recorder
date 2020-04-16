@@ -9,6 +9,7 @@ type ReactMediaRecorderRenderProps = {
   resumeRecording: () => void;
   stopRecording: () => void;
   mediaBlobUrl: null | string;
+  mediaBlob: Blob | null;
   status: StatusMessages;
   isAudioMuted: boolean;
   previewStream: MediaStream | null;
@@ -65,6 +66,7 @@ export const ReactMediaRecorder = ({
   const [status, setStatus] = useState<StatusMessages>("idle");
   const [isAudioMuted, setIsAudioMuted] = useState<boolean>(false);
   const [mediaBlobUrl, setMediaBlobUrl] = useState<string | null>(null);
+  const [mediaBlob, setMediaBlob] = useState<Blob | null>(null);
   const [error, setError] = useState<keyof typeof RecorderErrors>("NONE");
 
   const getMediaStream = useCallback(async () => {
@@ -184,6 +186,7 @@ export const ReactMediaRecorder = ({
     const blob = new Blob(mediaChunks.current, blobProperty);
     const url = URL.createObjectURL(blob);
     setStatus("stopped");
+    setMediaBlob(blob);
     setMediaBlobUrl(url);
     onStop(url);
   };
@@ -223,6 +226,7 @@ export const ReactMediaRecorder = ({
     pauseRecording,
     resumeRecording,
     stopRecording,
+    mediaBlob,
     mediaBlobUrl,
     status,
     isAudioMuted,
