@@ -1,6 +1,6 @@
-import { ReactElement, useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-type ReactMediaRecorderRenderProps = {
+type ReactMediaRecorderHook = {
   error: string;
   muteAudio: () => void;
   unMuteAudio: () => void;
@@ -8,15 +8,14 @@ type ReactMediaRecorderRenderProps = {
   pauseRecording: () => void;
   resumeRecording: () => void;
   stopRecording: () => void;
-  mediaBlobUrl: null | string;
-  mediaBlob: Blob | null;
+  mediaBlobUrl?: string;
+  mediaBlob?: Blob;
   status: StatusMessages;
   isAudioMuted: boolean;
   previewStream: MediaStream | null;
 };
 
 type ReactMediaRecorderProps = {
-  render: (props: ReactMediaRecorderRenderProps) => ReactElement;
   audio?: boolean | MediaTrackConstraints;
   video?: boolean | MediaTrackConstraints;
   screen?: boolean;
@@ -51,22 +50,22 @@ enum RecorderErrors {
   NO_RECORDER = "recorder_error"
 }
 
-export const ReactMediaRecorder = ({
-  render,
+
+export const useReactMediaRecorder = ({
   audio = true,
   video = false,
   onStop = () => null,
   blobPropertyBag,
   screen = false,
   mediaRecorderOptions = null
-}: ReactMediaRecorderProps) => {
+}: ReactMediaRecorderProps): ReactMediaRecorderHook => {
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const mediaChunks = useRef<Blob[]>([]);
   const mediaStream = useRef<MediaStream | null>(null);
   const [status, setStatus] = useState<StatusMessages>("idle");
   const [isAudioMuted, setIsAudioMuted] = useState<boolean>(false);
-  const [mediaBlobUrl, setMediaBlobUrl] = useState<string | null>(null);
-  const [mediaBlob, setMediaBlob] = useState<Blob | null>(null);
+  const [mediaBlobUrl, setMediaBlobUrl] = useState<string>();
+  const [mediaBlob, setMediaBlob] = useState<Blob>();
   const [error, setError] = useState<keyof typeof RecorderErrors>("NONE");
 
   const getMediaStream = useCallback(async () => {
@@ -110,7 +109,7 @@ export const ReactMediaRecorder = ({
     }
 
     if (screen) {
-      //@ts-ignore
+//@ts-ignore
       if (!window.navigator.mediaDevices.getDisplayMedia) {
         throw new Error("This browser doesn't support screen capturing");
       }
@@ -218,7 +217,7 @@ export const ReactMediaRecorder = ({
     }
   };
 
-  return render({
+  return {
     error: RecorderErrors[error],
     muteAudio: () => muteAudio(true),
     unMuteAudio: () => muteAudio(false),
@@ -233,5 +232,5 @@ export const ReactMediaRecorder = ({
     previewStream: mediaStream.current
       ? new MediaStream(mediaStream.current.getVideoTracks())
       : null
-  });
+  };
 };
