@@ -1,5 +1,5 @@
 {
-  "name": "use-media-recorder",
+  "name": "@dragan1810/use-media-recorder",
   "version": "1.0.0",
   "description": "A React hook based on MediaRecorder() API to record audio/video streams and Polyfill",
   "main": "index.js",

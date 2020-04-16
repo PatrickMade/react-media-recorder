@@ -1,47 +1,39 @@
 # react-media-recorder :o2: :video_camera: :microphone: :computer:
 
-`react-media-recorder` is a fully typed react component with render prop that can be used to:
+`use-media-recorder` is a fully typed react hook that can be used to:
 
 - Record audio/video
 - Record screen
+- Polyfiled audio for Safari
 
 using [MediaRecorder API](https://developer.mozilla.org/en-US/docs/Web/API/MediaRecorder).
+* forked from react-media-recorder
 
 ## Installation
 
 ```
-npm i react-media-recorder
+npm i @dragan1810/use-media-recorder
 ```
 
-or
-
-```
-yarn add react-media-recorder
-```
 
 ## Usage
 
 ```javascript
-import { ReactMediaRecorder } from "react-media-recorder";
+import { useReactMediaRecorder } from "@dragan1810/use-media-recorder";
 
-const RecordView = () => (
-  <div>
-    <ReactMediaRecorder
-      video
-      render={({ status, startRecording, stopRecording, mediaBlobUrl }) => (
+const RecordView = () => {
+    const {status, error, startRecording, stopRecording, mediaBlobUrl, mediaBlob} = useReactMediaRecorder({audio:true})
+
+  return (
         <div>
           <p>{status}</p>
           <button onClick={startRecording}>Start Recording</button>
           <button onClick={stopRecording}>Stop Recording</button>
           <video src={mediaBlobUrl} controls autoplay loop />
         </div>
-      )}
-    />
-  </div>
-);
+  )
+}
 ```
-
-Since `react-media-recording` uses render prop, you can define what to render in the view. Just don't forget to wire the `startRecording`, `stopRecording` and `mediaBlobUrl` to your component.
 
 ### Options / Props
 
@@ -176,36 +168,3 @@ A boolean prop that tells whether the audio is muted or not.
 #### previewStream
 
 If you want to create a live-preview of the video to the user, you can use this _stream_ and attach it to a `<video />` element. Please note that this is a **muted stream**. This is by design to get rid of internal microphone feedbacks on machines like laptop.
-
-For example:
-
-```tsx
-const VideoPreview = ({ stream }: { stream: MediaStream | null }) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
-
-  useEffect(() => {
-    if (videoRef.current && stream) {
-      videoRef.current.srcObject = stream;
-    }
-  }, [stream]);
-  if (!stream) {
-    return null;
-  }
-  return <video ref={videoRef} width={500} height={500} autoPlay controls />;
-};
-
-const App = () => (
-  <ReactMediaRecorder
-    video
-    render={({ videoPreviewStream }) => {
-      return <VideoPreview stream={videoPreviewStream} />;
-    }}
-  />
-);
-```
-
-## Contributing
-
-Feel free to submit a PR if you found a bug (I might've missed many! :grinning:) or if you want to enhance it further.
-
-Thanks!. Happy Recording!
