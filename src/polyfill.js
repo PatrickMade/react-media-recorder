@@ -1,3 +1,4 @@
+//@ts-nocheck
 (function () {
 	if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
 		module.exports = WebAudioTrack;
