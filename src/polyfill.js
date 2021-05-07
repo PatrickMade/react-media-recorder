@@ -23,10 +23,7 @@
 		window.currentAudioContext = new AudioContext();
 	}
 
-	function WebAudioTrack(config) {
-
-		config = config || {};
-
+	function WebAudioTrack(config = {}) {
 		var self = this;
 
 		initialize();
