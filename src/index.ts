@@ -162,7 +162,6 @@ export const useReactMediaRecorder = ({
 
   // Media Recorder Handlers
   const startRecording = async () => {
-    console.log(mediaChunks);
     mediaChunks.current = [];
     if (isWebkit) {
       setError("NONE");
