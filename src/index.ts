@@ -77,8 +77,8 @@ export const useReactMediaRecorder = ({
   const getMediaStream = useCallback(async () => {
     setStatus("acquiring_media");
     const requiredMedia: MediaStreamConstraints = {
-      audio: typeof audio === "boolean" ? !!audio : audio,
-      video: typeof video === "boolean" ? !!video : video
+      audio: typeof audio === "boolean" ? audio : audio,
+      video: typeof video === "boolean" ? video : video
     };
     try {
       if (screen) {
@@ -97,10 +97,9 @@ export const useReactMediaRecorder = ({
         }
         mediaStream.current = stream;
       } else {
-        const stream = await window.navigator.mediaDevices.getUserMedia(
+        mediaStream.current = await window.navigator.mediaDevices.getUserMedia(
             requiredMedia
         );
-        mediaStream.current = stream;
       }
       setStatus("idle");
     } catch (error) {
@@ -163,6 +162,7 @@ export const useReactMediaRecorder = ({
 
   // Media Recorder Handlers
   const startRecording = async () => {
+    mediaChunks.current = [];
     if (isWebkit) {
       setError("NONE");
       if (fallBackAudio.current) {
