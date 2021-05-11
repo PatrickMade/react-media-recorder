@@ -95,14 +95,17 @@ export const useReactMediaRecorder = ({
         }
         mediaStream.current = stream;
       } else {
+        console.log(requiredMedia);
         mediaStream.current = await window.navigator.mediaDevices.getUserMedia(
             requiredMedia
         );
+        console.log(mediaStream);
       }
       setStatus("idle");
     } catch (error) {
       setError(error.name);
       setStatus("idle");
+      console.log(error);
     }
   }, [audio, video, screen]);
 
@@ -159,6 +162,7 @@ export const useReactMediaRecorder = ({
   const startRecording = async () => {
     mediaChunks.current = [];
       setError("NONE");
+      console.log(mediaStream.current);
       if (!mediaStream.current) {
         await getMediaStream();
       }
