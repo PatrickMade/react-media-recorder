@@ -1,6 +1,6 @@
 import {Dispatch, SetStateAction, useCallback, useEffect, useRef, useState} from "react";
-import AudioRecorder from 'audio-recorder-polyfill';
-window.MediaRecorder = AudioRecorder
+import WebkitAudio from './polyfill';
+
 
 type ReactMediaRecorderHook = {
   error: string;
@@ -64,6 +64,7 @@ export const useReactMediaRecorder = ({
                                         mediaRecorderOptions = null
                                       }: ReactMediaRecorderProps): ReactMediaRecorderHook => {
   const mediaRecorder = useRef<MediaRecorder | null>(null);
+  const fallBackAudio = useRef<WebkitAudio | null>(null);
   const mediaChunks = useRef<Blob[]>([]);
   const mediaStream = useRef<MediaStream | null>(null);
   const [status, setStatus] = useState<StatusMessages>("idle");
@@ -71,6 +72,7 @@ export const useReactMediaRecorder = ({
   const [mediaBlobUrl, setMediaBlobUrl] = useState<string>();
   const [mediaBlob, setMediaBlob] = useState<Blob>();
   const [error, setError] = useState<keyof typeof RecorderErrors>("NONE");
+  const isWebkit = !window.MediaRecorder;
 
   const getMediaStream = useCallback(async () => {
     setStatus("acquiring_media");
@@ -95,21 +97,22 @@ export const useReactMediaRecorder = ({
         }
         mediaStream.current = stream;
       } else {
-        console.log(requiredMedia);
         mediaStream.current = await window.navigator.mediaDevices.getUserMedia(
             requiredMedia
         );
-        console.log(mediaStream);
       }
       setStatus("idle");
     } catch (error) {
       setError(error.name);
       setStatus("idle");
-      console.log(error);
     }
   }, [audio, video, screen]);
 
   useEffect(() => {
+    if (isWebkit) {
+      fallBackAudio.current = new WebkitAudio();
+    }
+
     if (screen) {
       //@ts-ignore
       if (!window.navigator.mediaDevices.getDisplayMedia) {
@@ -141,7 +144,6 @@ export const useReactMediaRecorder = ({
     }
 
     if (mediaRecorderOptions && mediaRecorderOptions.mimeType) {
-      console.log(mediaRecorderOptions.mimeType);
       if (!MediaRecorder.isTypeSupported(mediaRecorderOptions.mimeType)) {
         console.error(
             `The specified MIME type you supplied for MediaRecorder doesn't support this browser`
@@ -156,13 +158,23 @@ export const useReactMediaRecorder = ({
     if (!mediaStream.current) {
       loadStream();
     }
-  }, [audio, screen, video, getMediaStream, mediaRecorderOptions]);
+  }, [audio, screen, video, getMediaStream, mediaRecorderOptions, isWebkit]);
 
   // Media Recorder Handlers
   const startRecording = async () => {
     mediaChunks.current = [];
+    if (isWebkit) {
       setError("NONE");
-      console.log(mediaStream.current);
+      if (fallBackAudio.current) {
+        fallBackAudio.current.startRecording(function () {
+          setStatus("recording");
+        });
+      } else {
+        setError("NotFoundError");
+      }
+
+    } else {
+      setError("NONE");
       if (!mediaStream.current) {
         await getMediaStream();
       }
@@ -177,23 +189,18 @@ export const useReactMediaRecorder = ({
         mediaRecorder.current.start();
         setStatus("recording");
       }
+    }
   };
 
   const onRecordingActive = ({ data }: BlobEvent) => {
-    console.log(data);
-    console.log(mediaChunks.current);
     mediaChunks.current.push(data);
-    console.log(mediaChunks.current);
   };
 
   const onRecordingStop = () => {
     const blobProperty: BlobPropertyBag =
-        MediaRecorder.prototype.mimeType || video ? { type: "video/mp4" } : { type: "audio/wav" };
-    console.log(blobProperty);
+        blobPropertyBag || video ? { type: "video/mp4" } : { type: "audio/wav" };
     const blob = new Blob(mediaChunks.current, blobProperty);
-    console.log(blob);
     const url = URL.createObjectURL(blob);
-    console.log(url);
     setStatus("stopped");
     setMediaBlob(blob);
     setMediaBlobUrl(url);
@@ -222,11 +229,23 @@ export const useReactMediaRecorder = ({
   };
 
   const stopRecording = () => {
-    console.log(mediaRecorder);
+    if (isWebkit) {
+      if (fallBackAudio.current) {
+        fallBackAudio.current.stopRecording(function (blob: Blob) {
+          const url = URL.createObjectURL(blob);
+          setStatus("stopped");
+          setMediaBlob(blob);
+          setMediaBlobUrl(url)
+          onStop(url)
+        });
+      }
+    } else {
       if (mediaRecorder.current) {
         setStatus("stopping");
         mediaRecorder.current.stop();
       }
+    }
+
   };
 
   return {
