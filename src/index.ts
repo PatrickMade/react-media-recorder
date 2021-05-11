@@ -168,16 +168,19 @@ export const useReactMediaRecorder = ({
       }
       if (mediaStream.current) {
         console.log(mediaStream.current);
-        mediaRecorder.current = new MediaRecorder(mediaStream.current);
-        mediaRecorder.current.ondataavailable = onRecordingActive;
-        mediaRecorder.current.onstop = onRecordingStop;
-        mediaRecorder.current.onerror = () => {
-          setError("NO_RECORDER");
-          setStatus("idle");
-        };
-        console.log(mediaRecorder.current);
-        mediaRecorder.current.start();
-        setStatus("recording");
+        mediaRecorder.current = new AudioRecorder(mediaStream.current);
+        if(mediaRecorder.current)
+        {
+          mediaRecorder.current.ondataavailable = onRecordingActive;
+          mediaRecorder.current.onstop = onRecordingStop;
+          mediaRecorder.current.onerror = () => {
+            setError("NO_RECORDER");
+            setStatus("idle");
+          };
+          console.log(mediaRecorder.current);
+          mediaRecorder.current.start();
+          setStatus("recording");
+        }
       }
   };
 
