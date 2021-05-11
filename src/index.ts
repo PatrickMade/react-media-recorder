@@ -1,6 +1,6 @@
 import {Dispatch, SetStateAction, useCallback, useEffect, useRef, useState} from "react";
 import AudioRecorder from 'audio-recorder-polyfill';
-window.MediaRecorder = AudioRecorder;
+window.MediaRecorder = AudioRecorder
 
 type ReactMediaRecorderHook = {
   error: string;
@@ -181,7 +181,7 @@ export const useReactMediaRecorder = ({
 
   const onRecordingStop = () => {
     const blobProperty: BlobPropertyBag =
-        blobPropertyBag || video ? { type: "video/mp4" } : { type: "audio/wav" };
+        MediaRecorder.prototype.mimeType || video ? { type: "video/mp4" } : { type: "audio/wav" };
     const blob = new Blob(mediaChunks.current, blobProperty);
     const url = URL.createObjectURL(blob);
     setStatus("stopped");
