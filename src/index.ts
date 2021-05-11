@@ -71,6 +71,7 @@ export const useReactMediaRecorder = ({
 	const [isAudioMuted, setIsAudioMuted] = useState<boolean>(false);
 	const [mediaBlobUrl, setMediaBlobUrl] = useState<string>();
 	const [mediaBlob, setMediaBlob] = useState<Blob>();
+	const [dataType, setDataType] = useState<string>('audio/wav');
 	const [error, setError] = useState<keyof typeof RecorderErrors>("NONE");
 
 	const getMediaStream = useCallback(async () => {
@@ -182,15 +183,16 @@ export const useReactMediaRecorder = ({
 	};
 
 	const onRecordingActive = ({data}: BlobEvent) => {
+		setDataType(data.type);
+		console.log('onRecordingActive - data');
 		console.log(data);
-		console.log(mediaChunks.current);
 		mediaChunks.current.push(data);
+		console.log('onRecordingActive - media chunks');
 		console.log(mediaChunks.current);
 	};
 
 	const onRecordingStop = () => {
-		const blobProperty: BlobPropertyBag =
-			MediaRecorder.prototype.mimeType || video ? {type: "video/mp4"} : {type: "audio/wav"};
+		const blobProperty: BlobPropertyBag = {type: dataType};
 		console.log(blobProperty);
 		const blob = new Blob(mediaChunks.current, blobProperty);
 		console.log(blob);
@@ -200,7 +202,6 @@ export const useReactMediaRecorder = ({
 		setMediaBlob(blob);
 		setMediaBlobUrl(url);
 		onStop(url);
-
 	};
 
 	const muteAudio = (mute: boolean) => {
