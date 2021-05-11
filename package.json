@@ -40,5 +40,8 @@
     "jsmin": "^1.0.1",
     "typescript": "^3.8.3"
   },
-  "types": "./lib/index.d.ts"
+  "types": "./lib/index.d.ts",
+  "dependencies": {
+    "audio-recorder-polyfill": "^0.4.1"
+  }
 }
