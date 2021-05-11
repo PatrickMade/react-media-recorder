@@ -176,14 +176,20 @@ export const useReactMediaRecorder = ({
   };
 
   const onRecordingActive = ({ data }: BlobEvent) => {
+    console.log(data);
+    console.log(mediaChunks.current);
     mediaChunks.current.push(data);
+    console.log(mediaChunks.current);
   };
 
   const onRecordingStop = () => {
     const blobProperty: BlobPropertyBag =
         MediaRecorder.prototype.mimeType || video ? { type: "video/mp4" } : { type: "audio/wav" };
+    console.log(blobProperty);
     const blob = new Blob(mediaChunks.current, blobProperty);
+    console.log(blob);
     const url = URL.createObjectURL(blob);
+    console.log(url);
     setStatus("stopped");
     setMediaBlob(blob);
     setMediaBlobUrl(url);
@@ -212,6 +218,7 @@ export const useReactMediaRecorder = ({
   };
 
   const stopRecording = () => {
+    console.log(mediaRecorder);
       if (mediaRecorder.current) {
         setStatus("stopping");
         mediaRecorder.current.stop();
