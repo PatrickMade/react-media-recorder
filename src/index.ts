@@ -167,6 +167,7 @@ export const useReactMediaRecorder = ({
         await getMediaStream();
       }
       if (mediaStream.current) {
+        console.log(mediaStream.current);
         mediaRecorder.current = new MediaRecorder(mediaStream.current);
         mediaRecorder.current.ondataavailable = onRecordingActive;
         mediaRecorder.current.onstop = onRecordingStop;
@@ -174,6 +175,7 @@ export const useReactMediaRecorder = ({
           setError("NO_RECORDER");
           setStatus("idle");
         };
+        console.log(mediaRecorder.current);
         mediaRecorder.current.start();
         setStatus("recording");
       }
