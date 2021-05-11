@@ -1,7 +1,7 @@
 import {Dispatch, SetStateAction, useCallback, useEffect, useRef, useState} from "react";
 import AudioRecorder from 'audio-recorder-polyfill';
 
-window.MediaRecorder = AudioRecorder
+window.MediaRecorder = AudioRecorder;
 
 type ReactMediaRecorderHook = {
 	error: string;
@@ -101,14 +101,14 @@ export const useReactMediaRecorder = ({
 					requiredMedia
 				);
 				mediaRecorder.current = new MediaRecorder(mediaStream.current);
-				mediaRecorder.current.ondataavailable = onRecordingActive;
-				mediaRecorder.current.onstop = onRecordingStop;
-				mediaRecorder.current.onerror = () => {
+				mediaRecorder.current?.addEventListener('dataavailable', onRecordingActive);
+				mediaRecorder.current?.addEventListener('stop', onRecordingStop);
+				mediaRecorder.current?.addEventListener('error', () => {
 					setError("NO_RECORDER");
 					setStatus("idle");
-				};
-				console.log(mediaRecorder.current);
+				});
 
+				console.log(mediaRecorder.current);
 			}
 			setStatus("idle");
 		} catch (error) {
