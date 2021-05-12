@@ -95,7 +95,6 @@ export const useReactMediaRecorder = ({
 				}
 				mediaStream.current = stream;
 			} else {
-				console.log(requiredMedia);
 				mediaStream.current = await navigator.mediaDevices.getUserMedia(
 					requiredMedia
 				);
@@ -106,14 +105,11 @@ export const useReactMediaRecorder = ({
 					setError("NO_RECORDER");
 					setStatus("idle");
 				});
-
-				console.log(mediaRecorder.current);
 			}
 			setStatus("idle");
 		} catch (error) {
 			setError(error.name);
 			setStatus("idle");
-			console.log(error);
 		}
 	}, [audio, video, screen]);
 
@@ -149,7 +145,6 @@ export const useReactMediaRecorder = ({
 		}
 
 		if (mediaRecorderOptions && mediaRecorderOptions.mimeType) {
-			console.log(mediaRecorderOptions.mimeType);
 			if (!AudioRecorder.isTypeSupported(mediaRecorderOptions.mimeType)) {
 				console.error(
 					`The specified MIME type you supplied for MediaRecorder doesn't support this browser`
@@ -170,7 +165,6 @@ export const useReactMediaRecorder = ({
 	const startRecording = async () => {
 		mediaChunks.current = [];
 		setError("NONE");
-		console.log(mediaStream.current);
 		if (!mediaStream.current) {
 			await getMediaStream();
 		}
@@ -182,20 +176,13 @@ export const useReactMediaRecorder = ({
 
 	const onRecordingActive = ({data}: BlobEvent) => {
 		setDataType(data.type);
-		console.log('onRecordingActive - data');
-		console.log(data);
 		mediaChunks.current.push(data);
-		console.log('onRecordingActive - media chunks');
-		console.log(mediaChunks.current);
 	};
 
 	const onRecordingStop = () => {
 		const blobProperty: BlobPropertyBag = {type: dataType};
-		console.log(blobProperty);
 		const blob = new Blob(mediaChunks.current, blobProperty);
-		console.log(blob);
 		const url = URL.createObjectURL(blob);
-		console.log(url);
 		setStatus("stopped");
 		setMediaBlob(blob);
 		setMediaBlobUrl(url);
@@ -223,7 +210,6 @@ export const useReactMediaRecorder = ({
 	};
 
 	const stopRecording = () => {
-		console.log(mediaRecorder);
 		if (mediaRecorder.current) {
 			setStatus("stopping");
 			mediaRecorder.current.stop();
