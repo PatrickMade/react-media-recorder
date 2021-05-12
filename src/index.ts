@@ -1,8 +1,6 @@
 import {Dispatch, SetStateAction, useCallback, useEffect, useRef, useState} from "react";
 import AudioRecorder from 'audio-recorder-polyfill';
 
-window.MediaRecorder = AudioRecorder;
-
 type ReactMediaRecorderHook = {
 	error: string;
 	muteAudio: () => void;
@@ -101,7 +99,7 @@ export const useReactMediaRecorder = ({
 				mediaStream.current = await navigator.mediaDevices.getUserMedia(
 					requiredMedia
 				);
-				mediaRecorder.current = new MediaRecorder(mediaStream.current);
+				mediaRecorder.current = new AudioRecorder(mediaStream.current);
 				mediaRecorder.current?.addEventListener('dataavailable', onRecordingActive);
 				mediaRecorder.current?.addEventListener('stop', onRecordingStop);
 				mediaRecorder.current?.addEventListener('error', () => {
@@ -152,7 +150,7 @@ export const useReactMediaRecorder = ({
 
 		if (mediaRecorderOptions && mediaRecorderOptions.mimeType) {
 			console.log(mediaRecorderOptions.mimeType);
-			if (!MediaRecorder.isTypeSupported(mediaRecorderOptions.mimeType)) {
+			if (!AudioRecorder.isTypeSupported(mediaRecorderOptions.mimeType)) {
 				console.error(
 					`The specified MIME type you supplied for MediaRecorder doesn't support this browser`
 				);
