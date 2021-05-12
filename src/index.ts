@@ -83,11 +83,11 @@ export const useReactMediaRecorder = ({
 		try {
 			if (screen) {
 				//@ts-ignore
-				const stream = (await window.navigator.mediaDevices.getDisplayMedia({
+				const stream = (await navigator.mediaDevices.getDisplayMedia({
 					video: video || true
 				})) as MediaStream;
 				if (audio) {
-					const audioStream = await window.navigator.mediaDevices.getUserMedia({
+					const audioStream = await navigator.mediaDevices.getUserMedia({
 						audio
 					});
 
@@ -98,7 +98,7 @@ export const useReactMediaRecorder = ({
 				mediaStream.current = stream;
 			} else {
 				console.log(requiredMedia);
-				mediaStream.current = await window.navigator.mediaDevices.getUserMedia(
+				mediaStream.current = await navigator.mediaDevices.getUserMedia(
 					requiredMedia
 				);
 				mediaRecorder.current = new MediaRecorder(mediaStream.current);
@@ -122,7 +122,7 @@ export const useReactMediaRecorder = ({
 	useEffect(() => {
 		if (screen) {
 			//@ts-ignore
-			if (!window.navigator.mediaDevices.getDisplayMedia) {
+			if (!navigator.mediaDevices.getDisplayMedia) {
 				throw new Error("This browser doesn't support screen capturing");
 			}
 		}
